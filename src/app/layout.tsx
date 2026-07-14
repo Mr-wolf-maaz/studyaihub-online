@@ -15,6 +15,9 @@ export const metadata: Metadata = {
     "typing learner", "typing practice", "Urdu typing", "Hindi typing",
     "student tools", "blog", "StudyAIHub",
   ],
+    verification: {
+    google: "KvdeXxUFjuUzTXeK0qj-y_JV0yPiJdctn6NY8hVjZRY",
+  },
   openGraph: {
     title: "StudyAIHub - All-in-One Student Toolkit",
     description:
@@ -35,7 +38,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
-        <link rel="canonical" href="https://studyaihub.com" />
+        <link rel="canonical" href="https://studyaihub.online" />
         {/* Google Search Console verification: replace YOUR_TOKEN with the code Google gives you */}
         <meta name="google-site-verification" content="YOUR_TOKEN" />
       </head>
