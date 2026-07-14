@@ -37,7 +37,7 @@ const layoutOptions = [
 
 const defaultSlides: Slide[] = [
   { id: "1", title: "Welcome to Your Presentation", content: "A comprehensive guide to success", layout: "title", notes: "", imageUrl: "" },
-  { id: "2", title: "Key Points", content: "• First important point\n• Second important point\n• Third important point\n• Fourth important point", layout: "content", notes: "Discuss each point", imageUrl: "" },
+  { id: "2", title: "Key Points", content: "• First important point\n• Second important point\n• Third important point\n• Fourth important point", layout: "content", notes: "Discuss each point in detail", imageUrl: "" },
   { id: "3", title: "Our Vision", content: "Left column content\n\n• Point A\n• Point B", layout: "two-column", notes: "", imageUrl: "" },
   { id: "4", title: "Inspiration", content: "The only way to do great work is to love what you do.", layout: "quote", notes: "Steve Jobs quote", imageUrl: "" },
 ];
@@ -204,7 +204,7 @@ function renderSlideContent(s: Slide, themeId: string) {
           {s.imageUrl ? (
             <img src={s.imageUrl} alt="" style={{ width: "100%", height: "280px", objectFit: "cover", borderRadius: "12px" }} />
           ) : (
-            <div style={{ width: "100%", height: "280px", background: "rgba(255,255,255,0.1)", borderRadius: "12px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "48px" }}>🖼️</div>
+            <div style={{ width: "100%", height: "280px", background: "rgba(255,255,255,0.1)", borderRadius: "12px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "48px" }}>📸</div>
           )}
         </div>
         <div style={{ flex: 1 }}>
@@ -245,6 +245,7 @@ export default function PresentationMakerPage() {
   const [downloading, setDownloading] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
   const captureRef = useRef<HTMLDivElement>(null);
+  const pdfGenerationRef = useRef<boolean>(false);
 
   const slide = data.slides[currentSlide];
 
@@ -274,6 +275,7 @@ export default function PresentationMakerPage() {
 
   const downloadPDF = useCallback(async () => {
     setDownloading(true);
+    pdfGenerationRef.current = true;
     try {
       const html2canvas = (await import("html2canvas")).default;
       const jsPDF = (await import("jspdf")).default;
@@ -282,14 +284,32 @@ export default function PresentationMakerPage() {
       const pdfH = pdf.internal.pageSize.getHeight();
 
       for (let i = 0; i < data.slides.length; i++) {
-        setCurrentSlide(i);
-        // Wait for React to re-render the capture element with the new slide
-        await new Promise(r => setTimeout(r, 600));
+        if (!pdfGenerationRef.current) break;
 
-        const el = captureRef.current;
-        if (!el) continue;
+        // Create a temporary container to render the slide
+        const tempDiv = document.createElement("div");
+        tempDiv.style.position = "fixed";
+        tempDiv.style.left = "-10000px";
+        tempDiv.style.top = "0";
+        tempDiv.style.zIndex = "-9999";
+        tempDiv.style.opacity = "1";
+        tempDiv.style.pointerEvents = "none";
+        
+        // Render the slide content directly
+        const slideContent = renderSlideContent(data.slides[i], data.theme);
+        tempDiv.innerHTML = `
+          <div>
+            ${new XMLSerializer().serializeToString(
+              slideContent as any
+            )}
+          </div>
+        `;
+        document.body.appendChild(tempDiv);
 
-        const canvas = await html2canvas(el, {
+        // Wait for content to be available
+        await new Promise(r => setTimeout(r, 300));
+
+        const canvas = await html2canvas(tempDiv, {
           scale: 2,
           backgroundColor: null,
           logging: false,
@@ -297,6 +317,8 @@ export default function PresentationMakerPage() {
           width: 960,
           height: 540,
         });
+
+        document.body.removeChild(tempDiv);
 
         const imgData = canvas.toDataURL("image/png");
         if (i > 0) pdf.addPage();
@@ -308,6 +330,7 @@ export default function PresentationMakerPage() {
       console.error(err);
       alert("PDF download failed. Please try the PPT option.");
     }
+    pdfGenerationRef.current = false;
     setDownloading(false);
   }, [data]);
 
@@ -433,12 +456,12 @@ export default function PresentationMakerPage() {
           <div className="bg-white rounded-xl border border-slate-200 p-4">
             <h3 className="font-bold text-sm mb-3">Edit Slide {currentSlide + 1}</h3>
             <div className="space-y-3">
-              <div><label className="block text-xs font-medium text-slate-600 mb-1">Title</label><input value={slide.title} onChange={(e) => updateSlide("title", e.target.value)} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500" /></div>
-              <div><label className="block text-xs font-medium text-slate-600 mb-1">Content</label><textarea value={slide.content} onChange={(e) => updateSlide("content", e.target.value)} rows={4} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none" /></div>
-              <div><label className="block text-xs font-medium text-slate-600 mb-1">Image URL</label><input value={slide.imageUrl} onChange={(e) => updateSlide("imageUrl", e.target.value)} placeholder="https://example.com/image.jpg" className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500" />
+              <div><label className="block text-xs font-medium text-slate-600 mb-1">Title</label><input value={slide.title} onChange={(e) => updateSlide("title", e.target.value)} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" /></div>
+              <div><label className="block text-xs font-medium text-slate-600 mb-1">Content</label><textarea value={slide.content} onChange={(e) => updateSlide("content", e.target.value)} rows={4} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" /></div>
+              <div><label className="block text-xs font-medium text-slate-600 mb-1">Image URL</label><input value={slide.imageUrl} onChange={(e) => updateSlide("imageUrl", e.target.value)} placeholder="https://..." className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
                 {slide.imageUrl && <img src={slide.imageUrl} alt="Preview" className="mt-2 max-h-24 rounded-lg object-cover" />}
               </div>
-              <div><label className="block text-xs font-medium text-slate-600 mb-1">Speaker Notes</label><textarea value={slide.notes} onChange={(e) => updateSlide("notes", e.target.value)} rows={2} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none" /></div>
+              <div><label className="block text-xs font-medium text-slate-600 mb-1">Speaker Notes</label><textarea value={slide.notes} onChange={(e) => updateSlide("notes", e.target.value)} rows={2} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" /></div>
               <div className="flex gap-2">
                 <button onClick={() => moveSlide(-1)} disabled={currentSlide === 0} className="p-2 border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-30"><ChevronLeft size={16} /></button>
                 <button onClick={() => moveSlide(1)} disabled={currentSlide === data.slides.length - 1} className="p-2 border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-30"><ChevronRight size={16} /></button>
@@ -452,8 +475,8 @@ export default function PresentationMakerPage() {
           <div className="bg-white rounded-xl border border-slate-200 p-4 mt-4">
             <h3 className="font-bold text-sm mb-3">Presentation Info</h3>
             <div className="space-y-3">
-              <div><label className="block text-xs font-medium text-slate-600 mb-1">Title</label><input value={data.title} onChange={(e) => setData((d) => ({ ...d, title: e.target.value }))} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500" /></div>
-              <div><label className="block text-xs font-medium text-slate-600 mb-1">Author</label><input value={data.author} onChange={(e) => setData((d) => ({ ...d, author: e.target.value }))} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500" /></div>
+              <div><label className="block text-xs font-medium text-slate-600 mb-1">Title</label><input value={data.title} onChange={(e) => setData((d) => ({ ...d, title: e.target.value }))} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" /></div>
+              <div><label className="block text-xs font-medium text-slate-600 mb-1">Author</label><input value={data.author} onChange={(e) => setData((d) => ({ ...d, author: e.target.value }))} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" /></div>
             </div>
           </div>
         </div>
@@ -474,9 +497,9 @@ export default function PresentationMakerPage() {
               {slide.notes && <div className="border-t border-slate-200 bg-yellow-50 px-4 py-2"><p className="text-xs text-slate-500"><strong>Notes:</strong> {slide.notes}</p></div>}
             </div>
             <div className="flex items-center justify-center gap-4 mt-4">
-              <button onClick={() => setCurrentSlide(Math.max(0, currentSlide - 1))} disabled={currentSlide === 0} className="p-2 bg-white border border-slate-300 rounded-full shadow hover:bg-slate-50 disabled:opacity-30"><ChevronLeft size={20} /></button>
-              {data.slides.map((_, i) => (<button key={i} onClick={() => setCurrentSlide(i)} className={`w-3 h-3 rounded-full transition ${i === currentSlide ? "bg-purple-600 scale-125" : "bg-slate-300 hover:bg-slate-400"}`} />))}
-              <button onClick={() => setCurrentSlide(Math.min(data.slides.length - 1, currentSlide + 1))} disabled={currentSlide === data.slides.length - 1} className="p-2 bg-white border border-slate-300 rounded-full shadow hover:bg-slate-50 disabled:opacity-30"><ChevronRight size={20} /></button>
+              <button onClick={() => setCurrentSlide(Math.max(0, currentSlide - 1))} disabled={currentSlide === 0} className="p-2 bg-white border border-slate-300 rounded-full shadow hover:bg-slate-50 disabled:opacity-30"><ChevronLeft size={18} /></button>
+              {data.slides.map((_, i) => (<button key={i} onClick={() => setCurrentSlide(i)} className={`w-3 h-3 rounded-full transition ${i === currentSlide ? "bg-purple-600 scale-125" : "bg-slate-300"}`} />))}
+              <button onClick={() => setCurrentSlide(Math.min(data.slides.length - 1, currentSlide + 1))} disabled={currentSlide === data.slides.length - 1} className="p-2 bg-white border border-slate-300 rounded-full shadow hover:bg-slate-50 disabled:opacity-30"><ChevronRight size={18} /></button>
             </div>
           </div>
         </div>
