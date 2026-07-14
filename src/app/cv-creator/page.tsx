@@ -225,92 +225,49 @@ export default function CVCreatorPage() {
   const addSkill = () => { if (skillInput.trim()) { setData((d) => ({ ...d, skills: [...d.skills, skillInput.trim()] })); setSkillInput(""); } };
   const removeSkill = (i: number) => setData((d) => ({ ...d, skills: d.skills.filter((_, idx) => idx !== i) }));
 
+  const getFullHTML = useCallback(() => {
+    const el = captureRef.current;
+    if (!el) return "";
+    const styles = Array.from(document.styleSheets)
+      .map((sheet) => {
+        try { return Array.from(sheet.cssRules).map((r) => r.cssText).join("\n"); } catch { return ""; }
+      })
+      .join("\n");
+    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${data.personal.fullName} - CV</title><style>
+      ${styles}
+      @page{margin:0;size:A4;}
+      body{margin:0;padding:0;}
+      @media print{.no-print{display:none!important;}}
+    </style></head><body>${el.innerHTML}</body></html>`;
+  }, [data.personal.fullName]);
+
   const downloadPDF = useCallback(async () => {
     setDownloading(true);
     try {
-      const jsPDF = (await import("jspdf")).default;
-      const pdf = new jsPDF("p", "mm", "a4");
-      const p = data.personal;
-      const pageW = pdf.internal.pageSize.getWidth();
-      const margin = 20;
-      let y = 25;
-
-      const addText = (text: string, x: number, yy: number, size: number, style: string, color: [number,number,number]) => {
-        pdf.setFont("helvetica", style);
-        pdf.setFontSize(size);
-        pdf.setTextColor(...color);
-        const lines = pdf.splitTextToSize(text, pageW - x - margin);
-        pdf.text(lines, x, yy);
-        return lines.length * size * 0.4;
-      };
-
-      // Header
-      y += addText(p.fullName, margin, y, 22, "bold", [30, 58, 95]);
-      y += 2;
-      y += addText(`${p.email}  |  ${p.phone}  |  ${p.address}${p.website ? `  |  ${p.website}` : ""}${p.linkedin ? `  |  ${p.linkedin}` : ""}`, margin, y, 9, "normal", [100, 116, 139]);
-      y += 3;
-      pdf.setDrawColor(30, 58, 95);
-      pdf.setLineWidth(0.8);
-      pdf.line(margin, y, pageW - margin, y);
-      y += 8;
-
-      // Summary
-      if (p.summary) {
-        y += addText("PROFESSIONAL SUMMARY", margin, y, 11, "bold", [30, 58, 95]);
-        y += 2;
-        y += addText(p.summary, margin, y, 9.5, "normal", [51, 65, 85]);
-        y += 6;
-      }
-
-      // Experience
-      if (data.experiences.length > 0) {
-        y += addText("WORK EXPERIENCE", margin, y, 11, "bold", [30, 58, 95]);
-        y += 3;
-        for (const exp of data.experiences) {
-          y += addText(exp.position, margin, y, 10, "bold", [30, 41, 59]);
-          pdf.setFont("helvetica", "normal"); pdf.setFontSize(9); pdf.setTextColor(100, 116, 139);
-          pdf.text(`${exp.company}  |  ${exp.startDate} — ${exp.current ? "Present" : exp.endDate}`, margin, y); y += 4;
-          y += addText(exp.description, margin, y, 9, "normal", [51, 65, 85]);
-          y += 5;
-        }
-      }
-
-      // Education
-      if (data.education.length > 0) {
-        y += addText("EDUCATION", margin, y, 11, "bold", [30, 58, 95]);
-        y += 3;
-        for (const edu of data.education) {
-          y += addText(`${edu.degree} in ${edu.field}`, margin, y, 10, "bold", [30, 41, 59]);
-          pdf.setFont("helvetica", "normal"); pdf.setFontSize(9); pdf.setTextColor(100, 116, 139);
-          pdf.text(`${edu.institution}  |  ${edu.startDate} — ${edu.endDate}${edu.gpa ? `  |  GPA: ${edu.gpa}` : ""}`, margin, y);
-          y += 5;
-        }
-      }
-
-      // Skills
-      if (data.skills.length > 0) {
-        y += 4;
-        y += addText("SKILLS", margin, y, 11, "bold", [30, 58, 95]);
-        y += 2;
-        y += addText(data.skills.join("  •  "), margin, y, 9.5, "normal", [51, 65, 85]);
-      }
-
-      pdf.save(`${p.fullName.replace(/\s+/g, "_")}_CV.pdf`);
+      const html = getFullHTML();
+      if (!html) throw new Error("No content");
+      // Open a new window, write the CV HTML, then auto-trigger print-to-PDF
+      const w = window.open("", "_blank");
+      if (!w) throw new Error("Popup blocked");
+      w.document.write(html);
+      w.document.close();
+      await new Promise(r => setTimeout(r, 800));
+      w.print();
+      w.close();
     } catch (err) {
       console.error(err);
-      alert("PDF download failed. Please try again.");
+      alert("Please allow popups for this site, then try again. Or use the HTML download and print from there.");
     }
     setDownloading(false);
-  }, [data]);
+  }, [getFullHTML]);
 
   const downloadHTML = useCallback(() => {
-    const contentEl = previewRef.current?.firstElementChild as HTMLElement | null;
-    if (!contentEl) return;
-    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${data.personal.fullName} - CV</title><style>body{margin:0;font-family:sans-serif;}</style></head><body>${contentEl.innerHTML}</body></html>`;
+    const html = getFullHTML();
+    if (!html) return;
     const blob = new Blob([html], { type: "text/html" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a"); a.href = url; a.download = `${data.personal.fullName.replace(/\s+/g, "_")}_CV.html`; a.click(); URL.revokeObjectURL(url);
-  }, [data.personal.fullName]);
+  }, [getFullHTML]);
 
   const downloadTXT = useCallback(() => {
     const txt = `${data.personal.fullName}\n${data.personal.email} | ${data.personal.phone} | ${data.personal.address}\n\nPROFESSIONAL SUMMARY\n${data.personal.summary}\n\nWORK EXPERIENCE\n${data.experiences.map((e) => `${e.position} at ${e.company}\n${e.startDate} - ${e.current ? "Present" : e.endDate}\n${e.description}`).join("\n\n")}\n\nEDUCATION\n${data.education.map((e) => `${e.degree} in ${e.field}, ${e.institution}\n${e.startDate} - ${e.endDate}${e.gpa ? ` | GPA: ${e.gpa}` : ""}`).join("\n\n")}\n\nSKILLS\n${data.skills.join(", ")}`;
@@ -320,9 +277,16 @@ export default function CVCreatorPage() {
   }, [data]);
 
   const TemplateComponent = templateMap[template];
+  const captureRef = useRef<HTMLDivElement>(null);
 
   return (
     <div className="min-h-screen bg-slate-50">
+      {/* Hidden render area — ALWAYS in DOM, never display:none, used for PDF capture */}
+      <div style={{ position: "fixed", left: "-10000px", top: 0, zIndex: -9999, opacity: 1, pointerEvents: "none" }}>
+        <div ref={captureRef}>
+          <TemplateComponent data={data} />
+        </div>
+      </div>
 
       <div className="bg-white border-b border-slate-200 px-4 py-4">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
