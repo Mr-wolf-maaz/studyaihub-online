@@ -231,30 +231,40 @@ export default function CVCreatorPage() {
       const html2canvas = (await import("html2canvas")).default;
       const jsPDF = (await import("jspdf")).default;
 
-      // Use the always-visible hidden capture element
       const el = captureRef.current;
       if (!el) throw new Error("No capture element");
 
-      await new Promise(r => setTimeout(r, 100));
+      // Clone the element and put it ON SCREEN so html2canvas can capture it
+      const clone = el.cloneNode(true) as HTMLElement;
+      clone.style.position = "fixed";
+      clone.style.left = "0";
+      clone.style.top = "0";
+      clone.style.zIndex = "-1";
+      clone.style.opacity = "1";
+      clone.style.pointerEvents = "none";
+      clone.style.background = "white";
+      document.body.appendChild(clone);
 
-      const canvas = await html2canvas(el, {
+      await new Promise(r => setTimeout(r, 300));
+
+      const canvas = await html2canvas(clone, {
         scale: 2,
         backgroundColor: "#ffffff",
         logging: false,
         useCORS: true,
       });
 
+      // Remove the clone immediately
+      document.body.removeChild(clone);
+
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF("p", "mm", "a4");
       const pdfW = pdf.internal.pageSize.getWidth();
       const pdfH = pdf.internal.pageSize.getHeight();
-      const imgW = canvas.width;
-      const imgH = canvas.height;
-      const ratio = imgW / imgH;
 
       // Fit to A4 width
       const drawW = pdfW;
-      const drawH = (pdfW * imgH) / imgW;
+      const drawH = (pdfW * canvas.height) / canvas.width;
 
       pdf.addImage(imgData, "PNG", 0, 0, drawW, Math.min(drawH, pdfH));
       pdf.save(`${data.personal.fullName.replace(/\s+/g, "_")}_CV.pdf`);
