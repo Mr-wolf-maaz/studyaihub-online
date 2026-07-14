@@ -275,37 +275,121 @@ export default function PresentationMakerPage() {
   const downloadPDF = useCallback(async () => {
     setDownloading(true);
     try {
-      const styles = Array.from(document.styleSheets)
-        .map((sheet) => { try { return Array.from(sheet.cssRules).map((r) => r.cssText).join("\n"); } catch { return ""; } })
-        .join("\n");
+      const jsPDF = (await import("jspdf")).default;
+      const pdf = new jsPDF("l", "mm", "a4");
+      const W = 297, H = 210, M = 18;
+      const cw = W - M * 2;
 
-      // Build all slides into one HTML document for printing
-      let slidesHTML = "";
+      const themeBgs: Record<string,[number,number,number]> = {
+        student:[59,130,246], business:[30,41,59], tech:[5,150,105],
+        realestate:[217,119,6], creative:[236,72,153], minimal:[241,245,249],
+      };
+      const themeText: Record<string,[number,number,number]> = {
+        student:[255,255,255], business:[255,255,255], tech:[255,255,255],
+        realestate:[255,255,255], creative:[255,255,255], minimal:[30,41,59],
+      };
+      const bg = themeBgs[data.theme] || [59,130,246];
+      const tc = themeText[data.theme] || [255,255,255];
+      const tc2: [number,number,number] = [Math.min(tc[0]*0.75,255), Math.min(tc[1]*0.75,255), Math.min(tc[2]*0.75,255)];
+
+      const themeIcons: Record<string,string> = {
+        student:"📚", business:"📊", tech:"💻", realestate:"🏠", creative:"🎨", minimal:"✨",
+      };
+
       for (let i = 0; i < data.slides.length; i++) {
-        setCurrentSlide(i);
-        await new Promise(r => setTimeout(r, 500));
-        const el = captureRef.current;
-        if (el) slidesHTML += `<div style="page-break-after:always;">${el.innerHTML}</div>`;
+        if (i > 0) pdf.addPage();
+        const s = data.slides[i];
+
+        // Fill background
+        pdf.setFillColor(...bg);
+        pdf.rect(0, 0, W, H, "F");
+
+        // Theme icon watermark
+        pdf.setFontSize(60); pdf.setTextColor(bg[0], bg[1], bg[2]);
+        // Draw a subtle shape instead of emoji
+        pdf.setFillColor(bg[0]+20, bg[1]+20, bg[2]+20);
+        pdf.circle(W - 40, H - 35, 25, "F");
+        pdf.circle(35, 35, 18, "F");
+
+        pdf.setTextColor(...tc);
+
+        if (s.layout === "title") {
+          pdf.setFont("helvetica","bold"); pdf.setFontSize(32);
+          const tl = pdf.splitTextToSize(s.title, cw - 40);
+          pdf.text(tl, W/2, H/2 - 12, {align:"center"});
+          pdf.setFont("helvetica","normal"); pdf.setFontSize(16);
+          pdf.setTextColor(...tc2);
+          const cl = pdf.splitTextToSize(s.content, cw - 60);
+          pdf.text(cl, W/2, H/2 + 18, {align:"center"});
+        } else if (s.layout === "quote") {
+          pdf.setFont("helvetica","italic"); pdf.setFontSize(22);
+          const ql = pdf.splitTextToSize('"' + s.content + '"', cw - 60);
+          pdf.text(ql, W/2, H/2 - 8, {align:"center"});
+          pdf.setFont("helvetica","normal"); pdf.setFontSize(13);
+          pdf.setTextColor(...tc2);
+          pdf.text("— " + s.title, W/2, H/2 + 30, {align:"center"});
+        } else {
+          // Content / two-column / image-focus / blank
+          pdf.setFont("helvetica","bold"); pdf.setFontSize(24);
+          const tl = pdf.splitTextToSize(s.title, cw);
+          pdf.text(tl, M, M + 8);
+          let y = M + 10 + tl.length * 10;
+          pdf.setFont("helvetica","normal"); pdf.setFontSize(14);
+          pdf.setTextColor(...tc2);
+          const cl = pdf.splitTextToSize(s.content, cw);
+          pdf.text(cl, M, y + 4);
+
+          // Theme-specific decorations
+          if (data.theme === "business") {
+            // Draw bar chart
+            pdf.setFillColor(tc[0],tc[1],tc[2]);
+            pdf.setTextColor(tc[0],tc[1],tc[2]);
+            const bx = W - 90, by = H - 50;
+            [55, 75, 40, 85, 60, 45, 70].forEach((h, j) => {
+              pdf.setFillColor(tc[0]-30, tc[1]-30, tc[2]-30);
+              pdf.rect(bx + j * 10, by - h * 0.4, 7, h * 0.4, "F");
+            });
+          }
+          if (data.theme === "tech") {
+            // Draw circuit lines
+            pdf.setDrawColor(tc[0],tc[1],tc[2]);
+            pdf.setLineWidth(0.5);
+            pdf.line(20, 50, 60, 50); pdf.line(60, 50, 60, 90); pdf.line(60, 90, 100, 90);
+            pdf.setFillColor(tc[0],tc[1],tc[2]);
+            pdf.circle(60, 50, 2, "F"); pdf.circle(60, 90, 2, "F"); pdf.circle(100, 90, 2, "F");
+            // Code snippet
+            pdf.setFont("courier","normal"); pdf.setFontSize(8);
+            pdf.setTextColor(tc2[0],tc2[1],tc2[2]);
+            pdf.text("const app = createApp();", 22, 140);
+            pdf.text("app.use(router);", 22, 146);
+            pdf.text("app.mount('#root');", 22, 152);
+          }
+          if (data.theme === "student") {
+            // Education icons
+            pdf.setFontSize(40);
+            pdf.setTextColor(bg[0]+30, bg[1]+30, bg[2]+30);
+            pdf.rect(W - 55, 20, 40, 50, "S");
+            // Ruled lines
+            for (let l = 0; l < 8; l++) {
+              pdf.setDrawColor(bg[0]+25, bg[1]+25, bg[2]+25);
+              pdf.setLineWidth(0.3);
+              pdf.line(M, H - 70 + l * 6, W - M, H - 70 + l * 6);
+            }
+          }
+          if (data.theme === "realestate") {
+            // Building silhouette
+            pdf.setFillColor(bg[0]+25, bg[1]+25, bg[2]+25);
+            pdf.rect(M, H - 60, 25, 50, "F");
+            pdf.rect(M + 30, H - 80, 35, 70, "F");
+            pdf.rect(M + 70, H - 50, 20, 40, "F");
+          }
+        }
       }
 
-      const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${data.title}</title><style>
-        ${styles}
-        @page{margin:0;size:landscape;}
-        body{margin:0;padding:0;}
-        @media print{.no-print{display:none!important;}}
-        div[style*="page-break"]{break-after:page;}
-      </style></head><body>${slidesHTML}</body></html>`;
-
-      const w = window.open("", "_blank");
-      if (!w) throw new Error("Popup blocked");
-      w.document.write(html);
-      w.document.close();
-      await new Promise(r => setTimeout(r, 800));
-      w.print();
-      w.close();
+      pdf.save(`${data.title.replace(/\s+/g, "_")}_Presentation.pdf`);
     } catch (err) {
       console.error(err);
-      alert("Please allow popups for this site, then try again. Or use the PPT download instead.");
+      alert("PDF download failed. Please try the PPT option.");
     }
     setDownloading(false);
   }, [data]);
