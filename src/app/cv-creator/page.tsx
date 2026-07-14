@@ -225,49 +225,172 @@ export default function CVCreatorPage() {
   const addSkill = () => { if (skillInput.trim()) { setData((d) => ({ ...d, skills: [...d.skills, skillInput.trim()] })); setSkillInput(""); } };
   const removeSkill = (i: number) => setData((d) => ({ ...d, skills: d.skills.filter((_, idx) => idx !== i) }));
 
-  const getFullHTML = useCallback(() => {
-    const el = captureRef.current;
-    if (!el) return "";
-    const styles = Array.from(document.styleSheets)
-      .map((sheet) => {
-        try { return Array.from(sheet.cssRules).map((r) => r.cssText).join("\n"); } catch { return ""; }
-      })
-      .join("\n");
-    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${data.personal.fullName} - CV</title><style>
-      ${styles}
-      @page{margin:0;size:A4;}
-      body{margin:0;padding:0;}
-      @media print{.no-print{display:none!important;}}
-    </style></head><body>${el.innerHTML}</body></html>`;
-  }, [data.personal.fullName]);
-
   const downloadPDF = useCallback(async () => {
     setDownloading(true);
     try {
-      const html = getFullHTML();
-      if (!html) throw new Error("No content");
-      // Open a new window, write the CV HTML, then auto-trigger print-to-PDF
-      const w = window.open("", "_blank");
-      if (!w) throw new Error("Popup blocked");
-      w.document.write(html);
-      w.document.close();
-      await new Promise(r => setTimeout(r, 800));
-      w.print();
-      w.close();
+      const jsPDF = (await import("jspdf")).default;
+      const pdf = new jsPDF("p", "mm", "a4");
+      const W = 210, H = 297, M = 20;
+      const p = data.personal;
+      const cw = W - M * 2;
+
+      // Helper: wrapped text, returns height used
+      const wt = (txt: string, x: number, y: number, fs: number, maxW: number, color: [number,number,number], style: string, align?: "left"|"center") => {
+        pdf.setFont("helvetica", style);
+        pdf.setFontSize(fs);
+        pdf.setTextColor(...color);
+        const lines = pdf.splitTextToSize(txt, maxW);
+        pdf.text(lines, align === "center" ? W / 2 : x, y, align ? { align } : undefined);
+        return lines.length * fs * 0.4;
+      };
+
+      if (template === "professional") {
+        // Blue header band
+        pdf.setFillColor(30, 58, 95);
+        pdf.rect(0, 0, W, 38, "F");
+        pdf.setTextColor(255, 255, 255);
+        pdf.setFont("helvetica", "bold"); pdf.setFontSize(22);
+        pdf.text(p.fullName, M, 16);
+        pdf.setFont("helvetica", "normal"); pdf.setFontSize(9);
+        pdf.text([p.email, p.phone, p.address, p.website || "", p.linkedin || ""].filter(Boolean).join("  |  "), M, 28);
+        let y = 48;
+        if (p.summary) { wt("PROFESSIONAL SUMMARY", M, y, 11, cw, [30,58,95], "bold"); y += 5; y += wt(p.summary, M, y, 9.5, cw, [51,65,85], "normal"); y += 7; }
+        if (data.experiences.length > 0) { wt("WORK EXPERIENCE", M, y, 11, cw, [30,58,95], "bold"); y += 5;
+          for (const e of data.experiences) { wt(e.position + "  —  " + e.company, M, y, 10, cw, [30,41,59], "bold"); y += 4;
+            pdf.setFont("helvetica","normal"); pdf.setFontSize(8); pdf.setTextColor(100,116,139);
+            pdf.text(e.startDate + " — " + (e.current ? "Present" : e.endDate), M, y); y += 4;
+            y += wt(e.description, M, y, 9, cw, [51,65,85], "normal"); y += 5; }
+        }
+        if (data.education.length > 0) { wt("EDUCATION", M, y, 11, cw, [30,58,95], "bold"); y += 5;
+          for (const e of data.education) { wt(e.degree + " in " + e.field, M, y, 10, cw, [30,41,59], "bold"); y += 4;
+            pdf.setFont("helvetica","normal"); pdf.setFontSize(8); pdf.setTextColor(100,116,139);
+            pdf.text(e.institution + "  |  " + e.startDate + " — " + e.endDate + (e.gpa ? "  |  GPA: " + e.gpa : ""), M, y); y += 5; }
+        }
+        if (data.skills.length > 0) { y += 3; wt("SKILLS", M, y, 11, cw, [30,58,95], "bold"); y += 5; wt(data.skills.join("  •  "), M, y, 9.5, cw, [51,65,85], "normal"); }
+      } else if (template === "modern") {
+        // Two-column: left sidebar
+        const sw = 68, cx = sw + 6, ciw = W - cx - M;
+        pdf.setFillColor(79, 70, 229);
+        pdf.rect(0, 0, sw, H, "F");
+        pdf.setTextColor(255,255,255);
+        // Initials circle
+        pdf.setFillColor(255,255,255); pdf.circle(sw/2, 30, 14, "F");
+        pdf.setTextColor(79,70,229); pdf.setFont("helvetica","bold"); pdf.setFontSize(16);
+        pdf.text(p.fullName.split(" ").map(n=>n[0]).join(""), sw/2, 33, {align:"center"});
+        pdf.setTextColor(255,255,255);
+        pdf.setFont("helvetica","bold"); pdf.setFontSize(13);
+        pdf.text(p.fullName, sw/2, 54, {align:"center"});
+        pdf.setFont("helvetica","normal"); pdf.setFontSize(8);
+        let sy = 66;
+        [p.email, p.phone, p.address, p.website, p.linkedin].filter(Boolean).forEach(v => { pdf.text(v, sw/2, sy, {align:"center"}); sy += 5; });
+        // Skills on sidebar
+        if (data.skills.length > 0) { sy += 8; pdf.setFont("helvetica","bold"); pdf.setFontSize(9);
+          pdf.text("SKILLS", sw/2, sy, {align:"center"}); sy += 6; pdf.setFont("helvetica","normal"); pdf.setFontSize(8);
+          data.skills.forEach(s => { pdf.text("• " + s, 8, sy); sy += 4.5; });
+        }
+        // Main content
+        let y = M;
+        if (p.summary) { wt("About Me", cx, y, 12, ciw, [79,70,229], "bold"); y += 6; y += wt(p.summary, cx, y, 9, ciw, [51,65,85], "normal"); y += 8; }
+        if (data.experiences.length > 0) { wt("Experience", cx, y, 12, ciw, [79,70,229], "bold"); y += 6;
+          for (const e of data.experiences) { wt(e.position, cx, y, 10, ciw, [30,41,59], "bold"); y += 4;
+            pdf.setFont("helvetica","normal"); pdf.setFontSize(8); pdf.setTextColor(79,70,229);
+            pdf.text(e.company + " · " + e.startDate + " — " + (e.current?"Present":e.endDate), cx, y); y += 4;
+            y += wt(e.description, cx, y, 9, ciw, [51,65,85], "normal"); y += 6; }
+        }
+        if (data.education.length > 0) { wt("Education", cx, y, 12, ciw, [79,70,229], "bold"); y += 6;
+          for (const e of data.education) { wt(e.degree + " in " + e.field, cx, y, 10, ciw, [30,41,59], "bold"); y += 4;
+            pdf.setFont("helvetica","normal"); pdf.setFontSize(8); pdf.setTextColor(79,70,229);
+            pdf.text(e.institution + " · " + e.startDate + " — " + e.endDate, cx, y); y += 5; }
+        }
+      } else if (template === "creative") {
+        // Gradient header band
+        pdf.setFillColor(236,72,153);
+        pdf.rect(0, 0, W, 36, "F");
+        pdf.setTextColor(255,255,255);
+        pdf.setFont("helvetica","bold"); pdf.setFontSize(22);
+        pdf.text(p.fullName, M, 16);
+        pdf.setFont("helvetica","normal"); pdf.setFontSize(9);
+        pdf.text([p.email, p.phone, p.address].join("  |  "), M, 27);
+        let y = 48;
+        if (p.summary) { pdf.setFillColor(252,231,243); pdf.roundedRect(M-4, y-4, cw+8, wt(p.summary, M+1, y, 9.5, cw-2, [51,65,85], "normal")+8, 3, 3, "F");
+          wt("✦ Summary", M, y, 11, cw, [236,72,153], "bold"); y += 5; y += wt(p.summary, M, y, 9.5, cw, [51,65,85], "normal"); y += 8; }
+        if (data.experiences.length > 0) { wt("✦ Experience", M, y, 11, cw, [236,72,153], "bold"); y += 5;
+          for (const e of data.experiences) { pdf.setFillColor(252,231,243); pdf.roundedRect(M-4, y-4, cw+8, 22, 3, 3, "F");
+            wt(e.position + "  —  " + e.company, M, y, 10, cw, [30,41,59], "bold"); y += 4;
+            pdf.setFont("helvetica","normal"); pdf.setFontSize(8); pdf.setTextColor(236,72,153);
+            pdf.text(e.startDate + " — " + (e.current?"Present":e.endDate), M, y); y += 4;
+            y += wt(e.description, M, y, 9, cw, [51,65,85], "normal"); y += 6; }
+        }
+        if (data.education.length > 0) { wt("✦ Education", M, y, 11, cw, [236,72,153], "bold"); y += 5;
+          for (const e of data.education) { wt(e.degree + " in " + e.field, M, y, 10, cw, [30,41,59], "bold"); y += 4;
+            pdf.setFont("helvetica","normal"); pdf.setFontSize(8); pdf.setTextColor(100,116,139);
+            pdf.text(e.institution + "  |  " + e.startDate + " — " + e.endDate, M, y); y += 5; }
+        }
+        if (data.skills.length > 0) { y += 3; wt("✦ Skills", M, y, 11, cw, [236,72,153], "bold"); y += 5;
+          data.skills.forEach(s => { pdf.setFillColor(236,72,153); pdf.roundedRect(M, y-3, pdf.getTextWidth(s)+10, 6, 3, 3, "F");
+            pdf.setTextColor(255,255,255); pdf.setFont("helvetica","normal"); pdf.setFontSize(8); pdf.text(s, M+5, y+1); y += 8; });
+        }
+      } else if (template === "minimal") {
+        pdf.setTextColor(51,65,85);
+        pdf.setFont("helvetica","normal"); pdf.setFontSize(26);
+        pdf.text(p.fullName, M, 24);
+        pdf.setFontSize(9); pdf.setTextColor(148,163,184);
+        pdf.text([p.email, p.phone, p.address].join("  ·  "), M, 32);
+        let y = 44;
+        if (p.summary) { pdf.setFont("helvetica","italic"); pdf.setFontSize(10); pdf.setTextColor(100,116,139);
+          const lines = pdf.splitTextToSize(p.summary, cw); pdf.text(lines, M, y); y += lines.length * 4.5 + 8; }
+        if (data.experiences.length > 0) { pdf.setFontSize(9); pdf.setTextColor(148,163,184); pdf.text("E X P E R I E N C E", M, y); y += 5;
+          for (const e of data.experiences) { pdf.setTextColor(30,41,59); pdf.setFont("helvetica","normal"); pdf.setFontSize(10);
+            pdf.text(e.position + "  at  " + e.company, M, y); y += 4;
+            pdf.setTextColor(148,163,184); pdf.setFontSize(8); pdf.text(e.startDate + " — " + (e.current?"Present":e.endDate), M, y); y += 4;
+            pdf.setTextColor(71,85,105); pdf.setFontSize(9); const dl = pdf.splitTextToSize(e.description, cw); pdf.text(dl, M, y); y += dl.length * 4 + 5; }
+        }
+        if (data.education.length > 0) { pdf.setFontSize(9); pdf.setTextColor(148,163,184); pdf.text("E D U C A T I O N", M, y); y += 5;
+          for (const e of data.education) { pdf.setTextColor(30,41,59); pdf.setFontSize(10); pdf.text(e.degree + " in " + e.field, M, y); y += 4;
+            pdf.setTextColor(100,116,139); pdf.setFontSize(8); pdf.text(e.institution + "  ·  " + e.startDate + " — " + e.endDate, M, y); y += 5; }
+        }
+        if (data.skills.length > 0) { y += 3; pdf.setFontSize(9); pdf.setTextColor(148,163,184); pdf.text("S K I L L S", M, y); y += 5;
+          pdf.setTextColor(71,85,105); pdf.setFontSize(9.5); pdf.text(data.skills.join("  /  "), M, y); }
+      } else {
+        // ATS
+        pdf.setTextColor(0,0,0);
+        pdf.setFont("helvetica","bold"); pdf.setFontSize(18);
+        pdf.text(p.fullName, M, 18);
+        pdf.setFont("helvetica","normal"); pdf.setFontSize(9);
+        pdf.text([p.email, p.phone, p.address].filter(Boolean).join("  |  "), M, 24);
+        pdf.setDrawColor(0); pdf.setLineWidth(0.5); pdf.line(M, 28, W-M, 28);
+        let y = 36;
+        if (p.summary) { pdf.setFont("helvetica","bold"); pdf.setFontSize(11); pdf.text("PROFESSIONAL SUMMARY", M, y); y += 5;
+          pdf.setFont("helvetica","normal"); pdf.setFontSize(9.5); const l = pdf.splitTextToSize(p.summary, cw); pdf.text(l, M, y); y += l.length * 4 + 5; }
+        if (data.experiences.length > 0) { pdf.setFont("helvetica","bold"); pdf.setFontSize(11); pdf.text("PROFESSIONAL EXPERIENCE", M, y); y += 5;
+          for (const e of data.experiences) { pdf.setFont("helvetica","bold"); pdf.setFontSize(10); pdf.text(e.position + ", " + e.company, M, y); y += 4;
+            pdf.setFont("helvetica","italic"); pdf.setFontSize(9); pdf.text(e.startDate + " - " + (e.current?"Present":e.endDate), M, y); y += 4;
+            pdf.setFont("helvetica","normal"); pdf.setFontSize(9); const dl = pdf.splitTextToSize(e.description, cw); pdf.text(dl, M, y); y += dl.length * 3.8 + 4; }
+        }
+        if (data.education.length > 0) { pdf.setFont("helvetica","bold"); pdf.setFontSize(11); pdf.text("EDUCATION", M, y); y += 5;
+          for (const e of data.education) { pdf.setFont("helvetica","bold"); pdf.setFontSize(10); pdf.text(e.degree + " in " + e.field + ", " + e.institution, M, y); y += 4;
+            pdf.setFont("helvetica","normal"); pdf.setFontSize(9); pdf.text(e.startDate + " - " + e.endDate + (e.gpa ? "  |  GPA: " + e.gpa : ""), M, y); y += 5; }
+        }
+        if (data.skills.length > 0) { pdf.setFont("helvetica","bold"); pdf.setFontSize(11); pdf.text("TECHNICAL SKILLS", M, y); y += 5;
+          pdf.setFont("helvetica","normal"); pdf.setFontSize(9.5); pdf.text(data.skills.join(", "), M, y); }
+      }
+
+      pdf.save(`${p.fullName.replace(/\s+/g, "_")}_CV.pdf`);
     } catch (err) {
       console.error(err);
-      alert("Please allow popups for this site, then try again. Or use the HTML download and print from there.");
+      alert("PDF download failed. Please try again.");
     }
     setDownloading(false);
-  }, [getFullHTML]);
+  }, [data, template]);
 
   const downloadHTML = useCallback(() => {
-    const html = getFullHTML();
-    if (!html) return;
+    const contentEl = captureRef.current as HTMLElement | null;
+    if (!contentEl) return;
+    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${data.personal.fullName} - CV</title><style>body{margin:0;font-family:sans-serif;}</style></head><body>${contentEl.innerHTML}</body></html>`;
     const blob = new Blob([html], { type: "text/html" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a"); a.href = url; a.download = `${data.personal.fullName.replace(/\s+/g, "_")}_CV.html`; a.click(); URL.revokeObjectURL(url);
-  }, [getFullHTML]);
+  }, [data.personal.fullName]);
 
   const downloadTXT = useCallback(() => {
     const txt = `${data.personal.fullName}\n${data.personal.email} | ${data.personal.phone} | ${data.personal.address}\n\nPROFESSIONAL SUMMARY\n${data.personal.summary}\n\nWORK EXPERIENCE\n${data.experiences.map((e) => `${e.position} at ${e.company}\n${e.startDate} - ${e.current ? "Present" : e.endDate}\n${e.description}`).join("\n\n")}\n\nEDUCATION\n${data.education.map((e) => `${e.degree} in ${e.field}, ${e.institution}\n${e.startDate} - ${e.endDate}${e.gpa ? ` | GPA: ${e.gpa}` : ""}`).join("\n\n")}\n\nSKILLS\n${data.skills.join(", ")}`;
