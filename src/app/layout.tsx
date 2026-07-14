@@ -39,8 +39,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en">
       <head>
         <link rel="canonical" href="https://studyaihub.online" />
-        {/* Google Search Console verification: replace YOUR_TOKEN with the code Google gives you */}
-        <meta name="google-site-verification" content="YOUR_TOKEN" />
+      <meta name="google-site-verification" content="KvdeXxUFjuUzTXeK0qj-y_JV0yPiJdctn6NY8hVjZRY" />
       </head>
       <body className="bg-slate-50 text-slate-900 antialiased min-h-screen flex flex-col">
         <Navbar />
