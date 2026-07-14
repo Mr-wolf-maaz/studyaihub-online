@@ -275,53 +275,37 @@ export default function PresentationMakerPage() {
   const downloadPDF = useCallback(async () => {
     setDownloading(true);
     try {
-      const html2canvas = (await import("html2canvas")).default;
-      const jsPDF = (await import("jspdf")).default;
-      const pdf = new jsPDF("l", "mm", "a4");
-      const pdfW = pdf.internal.pageSize.getWidth();
-      const pdfH = pdf.internal.pageSize.getHeight();
+      const styles = Array.from(document.styleSheets)
+        .map((sheet) => { try { return Array.from(sheet.cssRules).map((r) => r.cssText).join("\n"); } catch { return ""; } })
+        .join("\n");
 
+      // Build all slides into one HTML document for printing
+      let slidesHTML = "";
       for (let i = 0; i < data.slides.length; i++) {
         setCurrentSlide(i);
-        // Wait for React to re-render the capture element with the new slide
-        await new Promise(r => setTimeout(r, 600));
-
+        await new Promise(r => setTimeout(r, 500));
         const el = captureRef.current;
-        if (!el) continue;
-
-        // Clone the element and put it ON SCREEN so html2canvas can capture it
-        const clone = el.cloneNode(true) as HTMLElement;
-        clone.style.position = "fixed";
-        clone.style.left = "0";
-        clone.style.top = "0";
-        clone.style.zIndex = "-1";
-        clone.style.opacity = "1";
-        clone.style.pointerEvents = "none";
-        document.body.appendChild(clone);
-
-        await new Promise(r => setTimeout(r, 200));
-
-        const canvas = await html2canvas(clone, {
-          scale: 2,
-          backgroundColor: null,
-          logging: false,
-          useCORS: true,
-          width: 960,
-          height: 540,
-        });
-
-        // Remove the clone immediately
-        document.body.removeChild(clone);
-
-        const imgData = canvas.toDataURL("image/png");
-        if (i > 0) pdf.addPage();
-        pdf.addImage(imgData, "PNG", 0, 0, pdfW, pdfH);
+        if (el) slidesHTML += `<div style="page-break-after:always;">${el.innerHTML}</div>`;
       }
 
-      pdf.save(`${data.title.replace(/\s+/g, "_")}_Presentation.pdf`);
+      const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${data.title}</title><style>
+        ${styles}
+        @page{margin:0;size:landscape;}
+        body{margin:0;padding:0;}
+        @media print{.no-print{display:none!important;}}
+        div[style*="page-break"]{break-after:page;}
+      </style></head><body>${slidesHTML}</body></html>`;
+
+      const w = window.open("", "_blank");
+      if (!w) throw new Error("Popup blocked");
+      w.document.write(html);
+      w.document.close();
+      await new Promise(r => setTimeout(r, 800));
+      w.print();
+      w.close();
     } catch (err) {
       console.error(err);
-      alert("PDF download failed. Please try the PPT option.");
+      alert("Please allow popups for this site, then try again. Or use the PPT download instead.");
     }
     setDownloading(false);
   }, [data]);
