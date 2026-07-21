@@ -2,17 +2,22 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Menu, X, FileText, Presentation, Keyboard, BookOpen, Home } from "lucide-react";
+import { Menu, X, FileText, Presentation, Keyboard, BookOpen, Home, Info, Mail } from "lucide-react";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
 
-  const links = [
+  const mainLinks = [
     { href: "/", label: "Home", icon: Home },
     { href: "/cv-creator", label: "CV Creator", icon: FileText },
     { href: "/presentation-maker", label: "Presentation Maker", icon: Presentation },
     { href: "/typing-learner", label: "Typing Learner", icon: Keyboard },
     { href: "/blog", label: "Blog", icon: BookOpen },
+  ];
+
+  const secondaryLinks = [
+    { href: "/about-us", label: "About Us", icon: Info },
+    { href: "/contact-us", label: "Contact Us", icon: Mail },
   ];
 
   return (
@@ -27,7 +32,7 @@ export default function Navbar() {
           </Link>
 
           <div className="hidden md:flex items-center gap-1">
-            {links.map((l) => (
+            {mainLinks.map((l) => (
               <Link
                 key={l.href}
                 href={l.href}
@@ -37,6 +42,18 @@ export default function Navbar() {
                 {l.label}
               </Link>
             ))}
+            <div className="ml-2 pl-2 border-l border-slate-200">
+              {secondaryLinks.map((l) => (
+                <Link
+                  key={l.href}
+                  href={l.href}
+                  className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition"
+                >
+                  <l.icon size={16} />
+                  {l.label}
+                </Link>
+              ))}
+            </div>
           </div>
 
           <button
@@ -51,7 +68,7 @@ export default function Navbar() {
 
       {open && (
         <div className="md:hidden border-t border-slate-200 bg-white">
-          {links.map((l) => (
+          {mainLinks.map((l) => (
             <Link
               key={l.href}
               href={l.href}
@@ -62,6 +79,19 @@ export default function Navbar() {
               {l.label}
             </Link>
           ))}
+          <div className="border-t border-slate-200">
+            {secondaryLinks.map((l) => (
+              <Link
+                key={l.href}
+                href={l.href}
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition"
+              >
+                <l.icon size={16} />
+                {l.label}
+              </Link>
+            ))}
+          </div>
         </div>
       )}
     </nav>
