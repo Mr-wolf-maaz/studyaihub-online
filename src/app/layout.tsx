@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: {
@@ -45,9 +46,44 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <Navbar />
         <main className="flex-1">{children}</main>
         <footer className="bg-slate-900 text-slate-400 py-10">
-          <div className="max-w-7xl mx-auto px-4 text-center text-sm">
-            <p>&copy; {new Date().getFullYear()} StudyAIHub. All rights reserved.</p>
-            <p className="mt-1">CV Creator · Presentation Maker · Typing Learner · Blog</p>
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+              <div>
+                <h3 className="text-white font-semibold mb-4">Tools</h3>
+                <ul className="space-y-2 text-sm">
+                  <li><Link href="/cv-creator" className="hover:text-indigo-400 transition">CV Creator</Link></li>
+                  <li><Link href="/presentation-maker" className="hover:text-indigo-400 transition">Presentation Maker</Link></li>
+                  <li><Link href="/typing-learner" className="hover:text-indigo-400 transition">Typing Learner</Link></li>
+                  <li><Link href="/blog" className="hover:text-indigo-400 transition">Blog</Link></li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="text-white font-semibold mb-4">Company</h3>
+                <ul className="space-y-2 text-sm">
+                  <li><Link href="/about-us" className="hover:text-indigo-400 transition">About Us</Link></li>
+                  <li><Link href="/contact-us" className="hover:text-indigo-400 transition">Contact Us</Link></li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="text-white font-semibold mb-4">Legal</h3>
+                <ul className="space-y-2 text-sm">
+                  <li><Link href="/privacy-policy" className="hover:text-indigo-400 transition">Privacy Policy</Link></li>
+                  <li><Link href="/terms-and-conditions" className="hover:text-indigo-400 transition">Terms & Conditions</Link></li>
+                  <li><Link href="/disclaimer" className="hover:text-indigo-400 transition">Disclaimer</Link></li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="text-white font-semibold mb-4">Support</h3>
+                <ul className="space-y-2 text-sm">
+                  <li><a href="mailto:support@studyaihub.online" className="hover:text-indigo-400 transition">Support Email</a></li>
+                  <li><a href="mailto:info@studyaihub.online" className="hover:text-indigo-400 transition">General Inquiry</a></li>
+                </ul>
+              </div>
+            </div>
+            <div className="border-t border-slate-700 pt-8 text-center text-sm">
+              <p>&copy; {new Date().getFullYear()} StudyAIHub. All rights reserved.</p>
+              <p className="mt-2">CV Creator · Presentation Maker · Typing Learner · Blog</p>
+            </div>
           </div>
         </footer>
       </body>
