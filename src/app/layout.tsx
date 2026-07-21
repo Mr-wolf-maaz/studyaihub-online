@@ -16,7 +16,11 @@ export const metadata: Metadata = {
     "typing learner", "typing practice", "Urdu typing", "Hindi typing",
     "student tools", "blog", "StudyAIHub",
   ],
-    verification: {
+  icons: {
+    icon: "/favicon.svg",
+    apple: "/favicon.svg",
+  },
+  verification: {
     google: "KvdeXxUFjuUzTXeK0qj-y_JV0yPiJdctn6NY8hVjZRY",
   },
   openGraph: {
@@ -40,7 +44,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en">
       <head>
         <link rel="canonical" href="https://studyaihub.online" />
-      <meta name="google-site-verification" content="KvdeXxUFjuUzTXeK0qj-y_JV0yPiJdctn6NY8hVjZRY" />
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/favicon.svg" />
+        <meta name="google-site-verification" content="KvdeXxUFjuUzTXeK0qj-y_JV0yPiJdctn6NY8hVjZRY" />
       </head>
       <body className="bg-slate-50 text-slate-900 antialiased min-h-screen flex flex-col">
         <Navbar />
