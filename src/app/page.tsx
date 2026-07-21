@@ -11,6 +11,34 @@ export default function HomePage() {
           <div className="absolute bottom-10 right-10 w-96 h-96 bg-yellow-300 rounded-full blur-3xl" />
         </div>
         <div className="relative max-w-7xl mx-auto px-4 py-24 sm:py-32 text-center">
+          {/* Logo and Brand */}
+          <div className="mb-8 flex justify-center">
+            <div className="flex items-center gap-3">
+              <svg width="48" height="48" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" className="drop-shadow-lg">
+                <rect width="200" height="200" fill="#ffffff" rx="8"/>
+                <path d="M 50 60 Q 50 50 60 50 L 140 50 Q 150 50 150 60 L 150 140 Q 150 150 140 150 L 60 150 Q 50 150 50 140 Z" fill="none" stroke="#1e3a8a" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M 100 50 L 100 150" stroke="#1e3a8a" strokeWidth="2"/>
+                <line x1="65" y1="70" x2="95" y2="70" stroke="#22c55e" strokeWidth="2" strokeLinecap="round"/>
+                <line x1="65" y1="85" x2="95" y2="85" stroke="#22c55e" strokeWidth="2" strokeLinecap="round"/>
+                <line x1="65" y1="100" x2="95" y2="100" stroke="#22c55e" strokeWidth="2" strokeLinecap="round"/>
+                <circle cx="120" cy="65" r="15" fill="none" stroke="#22c55e" strokeWidth="2"/>
+                <text x="120" y="72" fontSize="16" fontWeight="bold" textAnchor="middle" fill="#22c55e" fontFamily="Arial">AI</text>
+                <circle cx="110" cy="100" r="3" fill="#1e3a8a"/>
+                <circle cx="130" cy="95" r="3" fill="#1e3a8a"/>
+                <circle cx="135" cy="115" r="3" fill="#1e3a8a"/>
+                <circle cx="115" cy="125" r="3" fill="#1e3a8a"/>
+                <line x1="110" y1="100" x2="130" y2="95" stroke="#1e3a8a" strokeWidth="1.5"/>
+                <line x1="110" y1="100" x2="135" y2="115" stroke="#1e3a8a" strokeWidth="1.5"/>
+                <line x1="130" y1="95" x2="135" y2="115" stroke="#1e3a8a" strokeWidth="1.5"/>
+                <line x1="135" y1="115" x2="115" y2="125" stroke="#1e3a8a" strokeWidth="1.5"/>
+              </svg>
+              <div className="text-left">
+                <h2 className="text-2xl font-bold">StudyAIHub</h2>
+                <p className="text-xs text-indigo-100">Your Path to Success</p>
+              </div>
+            </div>
+          </div>
+
           <span className="inline-flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded-full px-4 py-1.5 text-sm font-medium mb-6">
             <Star size={14} /> Free Student Tools
           </span>
