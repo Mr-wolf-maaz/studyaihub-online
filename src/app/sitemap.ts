@@ -4,7 +4,7 @@ import { blogs } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = "https://studyaihub.com";
+  const baseUrl = "https://studyaihub.online";
 
   const staticPages: MetadataRoute.Sitemap = [
     { url: baseUrl, lastModified: new Date(), changeFrequency: "weekly", priority: 1 },
