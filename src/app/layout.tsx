@@ -1,3 +1,4 @@
+import Script from "next/script";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import "./globals.css";
@@ -92,6 +93,20 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             </div>
           </div>
         </footer>
+        <Script
+  src="https://www.googletagmanager.com/gtag/js?id=G-9KRV3JG20J"
+  strategy="afterInteractive"
+/>
+
+<Script id="google-analytics" strategy="afterInteractive">
+  {`
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-9KRV3JG20J');
+  `}
+</Script>
       </body>
     </html>
   );
