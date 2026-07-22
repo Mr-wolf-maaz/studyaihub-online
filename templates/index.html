@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Templates Gallery</title>
+  <style>
+    body{font-family:Inter,system-ui,Arial;background:#f7fafc;color:#0f172a;padding:28px}
+    .wrap{max-width:1100px;margin:0 auto}
+    h1{margin-bottom:6px}
+    p.muted{color:#6b7280;margin-top:0}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:18px}
+    .card{background:white;border-radius:10px;padding:14px;box-shadow:0 8px 30px rgba(15,23,42,.06)}
+    .meta{font-size:13px;color:#475569;margin-top:8px}
+    .actions{margin-top:12px;display:flex;gap:8px}
+    .btn{background:#4f46e5;color:white;padding:8px 10px;border-radius:8px;text-decoration:none;font-weight:600}
+    .download{background:#06b6d4}
+    .raw{background:#111827}
+    .category{grid-column:1/-1;margin-top:10px;font-weight:700}
+
+    @media(max-width:1000px){.grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:640px){.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Templates Gallery</h1>
+    <p class="muted">All CV and presentation templates available in this repository. Click Preview to open the template in your browser, Download HTML to save a copy, or Download PDF to export a printable version.</p>
+
+    <div class="grid">
+      <div class="card">
+        <strong>CV — Modern</strong>
+        <div class="meta">Two-column modern CV (Inter + Poppins)</div>
+        <div class="actions">
+          <a class="btn" href="https://github.com/Mr-wolf-maaz/studyaihub-online/blob/main/templates/cv-modern.html" target="_blank">Preview</a>
+          <a class="btn raw" href="https://raw.githubusercontent.com/Mr-wolf-maaz/studyaihub-online/main/templates/cv-modern.html" target="_blank">Raw HTML</a>
+          <a class="btn download" href="https://raw.githubusercontent.com/Mr-wolf-maaz/studyaihub-online/main/templates/cv-modern.html" download>Download HTML</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <strong>CV — Minimal</strong>
+        <div class="meta">Clean, printable CV with Download PDF button</div>
+        <div class="actions">
+          <a class="btn" href="https://github.com/Mr-wolf-maaz/studyaihub-online/blob/main/templates/cv-minimal.html" target="_blank">Preview</a>
+          <a class="btn raw" href="https://raw.githubusercontent.com/Mr-wolf-maaz/studyaihub-online/main/templates/cv-minimal.html" target="_blank">Raw HTML</a>
+          <a class="btn download" href="https://raw.githubusercontent.com/Mr-wolf-maaz/studyaihub-online/main/templates/cv-minimal.html" download>Download HTML</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <strong>CV — Creative</strong>
+        <div class="meta">Colorful creative CV with strong visual accents</div>
+        <div class="actions">
+          <a class="btn" href="https://github.com/Mr-wolf-maaz/studyaihub-online/blob/main/templates/cv-creative.html" target="_blank">Preview</a>
+          <a class="btn raw" href="https://raw.githubusercontent.com/Mr-wolf-maaz/studyaihub-online/main/templates/cv-creative.html" target="_blank">Raw HTML</a>
+          <a class="btn download" href="https://raw.githubusercontent.com/Mr-wolf-maaz/studyaihub-online/main/templates/cv-creative.html" download>Download HTML</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <strong>CV — Professional</strong>
+        <div class="meta">Serif headings (Merriweather), print-optimized</div>
+        <div class="actions">
+          <a class="btn" href="https://github.com/Mr-wolf-maaz/studyaihub-online/blob/main/templates/cv-professional.html" target="_blank">Preview</a>
+          <a class="btn raw" href="https://raw.githubusercontent.com/Mr-wolf-maaz/studyaihub-online/main/templates/cv-professional.html" target="_blank">Raw HTML</a>
+          <a class="btn download" href="https://raw.githubusercontent.com/Mr-wolf-maaz/studyaihub-online/main/templates/cv-professional.html" download>Download HTML</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <strong>Presentation — Modern</strong>
+        <div class="meta">Slide deck with keyboard navigation and print rules</div>
+        <div class="actions">
+          <a class="btn" href="https://github.com/Mr-wolf-maaz/studyaihub-online/blob/main/templates/presentation-modern.html" target="_blank">Preview</a>
+          <a class="btn raw" href="https://raw.githubusercontent.com/Mr-wolf-maaz/studyaihub-online/main/templates/presentation-modern.html" target="_blank">Raw HTML</a>
+          <a class="btn download" href="https://raw.githubusercontent.com/Mr-wolf-maaz/studyaihub-online/main/templates/presentation-modern.html" download>Download HTML</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <strong>Presentation — Portfolio</strong>
+        <div class="meta">Visual portfolio slides with image placeholders</div>
+        <div class="actions">
+          <a class="btn" href="https://github.com/Mr-wolf-maaz/studyaihub-online/blob/main/templates/presentation-portfolio.html" target="_blank">Preview</a>
+          <a class="btn raw" href="https://raw.githubusercontent.com/Mr-wolf-maaz/studyaihub-online/main/templates/presentation-portfolio.html" target="_blank">Raw HTML</a>
+          <a class="btn download" href="https://raw.githubusercontent.com/Mr-wolf-maaz/studyaihub-online/main/templates/presentation-portfolio.html" download>Download HTML</a>
+        </div>
+      </div>
+
+      <div class="category">Helpful links</div>
+      <div class="card" style="grid-column:1/-1">
+        <strong>README & Export Instructions</strong>
+        <div class="meta">How to download PDFs, batch-export with Puppeteer, and print tips.</div>
+        <div class="actions">
+          <a class="btn" href="https://github.com/Mr-wolf-maaz/studyaihub-online/blob/main/templates/README.md" target="_blank">Open README</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>
