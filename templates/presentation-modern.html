@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Presentation — Modern</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    :root{--accent:#06B6D4;--bg:#0f172a;--slide-bg:#ffffff;--text:#0f172a}
+    html,body{height:100%;margin:0;background:var(--bg);font-family:Inter,system-ui,Arial;color:var(--text)}
+    .deck-wrap{max-width:1100px;margin:36px auto;padding:20px}
+    .controls{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+    .btn{background:var(--accent);color:white;padding:8px 12px;border-radius:8px;border:none;cursor:pointer}
+    .stage{background:#e6eef0;padding:36px;border-radius:12px;min-height:600px;display:flex;align-items:center;justify-content:center}
+    .slide{width:1024px;height:768px;background:var(--slide-bg);border-radius:6px;box-shadow:0 20px 40px rgba(2,6,23,.2);padding:64px;box-sizing:border-box;position:relative}
+    h1{font-family:Montserrat,system-ui;margin:0;font-size:48px;color:var(--text)}
+    p{font-size:20px;color:#374151}
+    .footer{position:absolute;left:64px;bottom:40px;color:#6b7280;font-size:13px}
+    .nav-dots{display:flex;gap:8px}
+    .dot{width:10px;height:10px;border-radius:50%;background:#d1d5db}
+    .dot.active{background:var(--accent)}
+
+    /* Print rules to export each slide as a separate PDF page */
+    @media print{
+      body{background:white}
+      .controls{display:none}
+      .deck-wrap{max-width:100%;padding:0;margin:0}
+      .stage{background:white;padding:0}
+      .slide{box-shadow:none;border-radius:0;width:100%;height:auto;page-break-after:always}
+    }
+
+    @media (max-width:1100px){.slide{width:840px;height:630px;padding:48px}}
+    @media (max-width:900px){.slide{width:100%;height:auto}}
+  </style>
+</head>
+<body>
+  <div class="deck-wrap" id="content">
+    <div class="controls">
+      <div>
+        <button class="btn" id="prev">◀ Prev</button>
+        <button class="btn" id="next" style="margin-left:8px">Next ▶</button>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <div class="nav-dots" id="dots"></div>
+        <button class="btn" id="downloadPdf">Download PDF</button>
+        <button class="btn" id="downloadHtml" style="margin-left:8px">Download HTML</button>
+      </div>
+    </div>
+
+    <div class="stage">
+      <div class="slide" data-index="0">
+        <h1>Project Showcase</h1>
+        <p style="margin-top:18px">A clean modern template for presenting ideas, roadmaps, and portfolios.</p>
+        <div class="footer">Slide 1 • Presentation — Modern</div>
+      </div>
+
+      <div class="slide" data-index="1" style="display:none">
+        <h1>Problem</h1>
+        <p style="margin-top:18px">Describe the problem you're solving with clear bullets and visuals.</p>
+        <div class="footer">Slide 2 • Problem</div>
+      </div>
+
+      <div class="slide" data-index="2" style="display:none">
+        <h1>Solution</h1>
+        <p style="margin-top:18px">Outline your solution, key features, and impact metrics.</p>
+        <div class="footer">Slide 3 • Solution</div>
+      </div>
+
+      <div class="slide" data-index="3" style="display:none">
+        <h1>Thank you</h1>
+        <p style="margin-top:18px">Contact • hello@example.com</p>
+        <div class="footer">Slide 4 • End</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const dots = document.getElementById('dots');
+    let index = 0;
+
+    function renderDots(){
+      dots.innerHTML = '';
+      slides.forEach((s,i)=>{
+        const d = document.createElement('div'); d.className='dot'+(i===index? ' active':''); d.addEventListener('click',()=>goTo(i)); dots.appendChild(d);
+      });
+    }
+
+    function show(i){
+      slides.forEach((s,idx)=> s.style.display = idx===i? 'block':'none');
+      index = i; renderDots();
+    }
+
+    function prev(){ show(Math.max(0,index-1)); }
+    function next(){ show(Math.min(slides.length-1,index+1)); }
+    function goTo(i){ show(i); }
+
+    document.getElementById('prev').addEventListener('click',prev);
+    document.getElementById('next').addEventListener('click',next);
+
+    document.addEventListener('keydown',(e)=>{
+      if(e.key==='ArrowRight') next(); if(e.key==='ArrowLeft') prev();
+    });
+
+    document.getElementById('downloadPdf').addEventListener('click',()=>{
+      // Use browser print which respects @media print rules and outputs each slide as a page
+      window.print();
+    });
+
+    document.getElementById('downloadHtml').addEventListener('click',()=>{
+      const blob = new Blob([document.documentElement.outerHTML], {type: 'text/html'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'presentation-modern.html'; a.click(); URL.revokeObjectURL(url);
+    });
+
+    // initialize
+    renderDots(); show(0);
+  </script>
+</body>
+</html>
