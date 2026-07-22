@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>CV — Minimal</title>
+  <style>
+    body{font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:#ffffff;color:#0f172a;padding:32px}
+    .container{max-width:800px;margin:0 auto;border:1px solid #e6edf3;padding:28px;border-radius:10px}
+    header{display:flex;justify-content:space-between;align-items:center}
+    h1{font-size:24px;margin:0}
+    .muted{color:#6b7280}
+    .cols{display:grid;grid-template-columns:1fr 2fr;gap:20px;margin-top:18px}
+    .section{margin-bottom:14px}
+    .download{margin-top:18px}
+    .btn{background:#111827;color:white;padding:10px 14px;border-radius:8px;border:none;cursor:pointer}
+    @media(max-width:720px){.cols{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="container" id="content">
+    <header>
+      <div>
+        <h1>Jordan Lee</h1>
+        <div class="muted">Software Engineer</div>
+      </div>
+      <div class="muted">jordan@example.com • +1 555 000 111</div>
+    </header>
+
+    <div class="cols">
+      <div>
+        <div class="section">
+          <h3 style="margin:0">Profile</h3>
+          <p class="muted">Focused engineer building reliable systems. Strong background in TypeScript and cloud infrastructure.</p>
+        </div>
+        <div class="section">
+          <h3 style="margin:0">Skills</h3>
+          <ul class="muted">
+            <li>TypeScript</li>
+            <li>React</li>
+            <li>Node.js</li>
+          </ul>
+        </div>
+      </div>
+
+      <div>
+        <div class="section">
+          <h3 style="margin:0">Experience</h3>
+          <p class="muted"><strong>Senior Engineer</strong> — Acme Inc (2021–Present)
+          <br>Led frontend rewrite; improved performance and accessibility.</p>
+        </div>
+        <div class="section">
+          <h3 style="margin:0">Education</h3>
+          <p class="muted">B.Sc. in Computer Science</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="download">
+      <button class="btn" id="downloadPdf">Download PDF</button>
+      <button class="btn" id="downloadHtml" style="margin-left:8px;background:#4f46e5">Download HTML</button>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+  <script>
+    document.getElementById('downloadPdf').addEventListener('click', function(){
+      const element = document.getElementById('content');
+      html2pdf().from(element).set({margin:0.4, filename: 'cv-minimal.pdf', html2canvas:{scale:2}}).save();
+    });
+    document.getElementById('downloadHtml').addEventListener('click', function(){
+      const blob = new Blob([document.documentElement.outerHTML], {type: 'text/html'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'cv-minimal.html'; a.click(); URL.revokeObjectURL(url);
+    });
+  </script>
+</body>
+</html>
