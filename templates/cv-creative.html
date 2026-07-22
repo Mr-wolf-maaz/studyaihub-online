@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>CV — Creative</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--accent1:#FF6B6B;--accent2:#7C3AED;--bg:#fff}
+    body{font-family:Poppins,system-ui,Arial,Helvetica;background:var(--bg);color:#0b1220;padding:36px}
+    .card{max-width:900px;margin:0 auto;border-radius:18px;overflow:hidden;display:grid;grid-template-columns:1fr 1fr;box-shadow:0 20px 40px rgba(2,6,23,.08)}
+    .left{padding:28px;background:linear-gradient(180deg,rgba(124,58,237,.06),rgba(255,107,107,.04))}
+    .photo{width:120px;height:120px;border-radius:18px;background:linear-gradient(135deg,var(--accent1),var(--accent2));margin-bottom:16px}
+    h1{margin:0;font-size:24px}
+    .role{color:rgba(11,18,32,.6);margin-top:6px}
+    .meta{font-size:13px;color:rgba(11,18,32,.6)}
+    .skills{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+    .chip{background:linear-gradient(90deg,rgba(255,107,107,.12),rgba(124,58,237,.06));padding:6px 10px;border-radius:999px;font-weight:600;color:var(--accent2);font-size:13px}
+    .right{padding:28px;background:white}
+    .section{margin-bottom:14px}
+    .headline{display:flex;justify-content:space-between;align-items:center}
+    .btn{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:white;padding:10px 14px;border-radius:10px;border:none;cursor:pointer}
+    @media(max-width:800px){.card{grid-template-columns:1fr}
+      .photo{margin:0 auto}
+      .left{text-align:center}}
+  </style>
+</head>
+<body>
+  <div class="card" id="content">
+    <div class="left">
+      <div class="photo"></div>
+      <h1>Taylor Reed</h1>
+      <div class="role">Creative Product Designer</div>
+      <div class="meta" style="margin-top:10px">taylor@example.com · +1 555 333 777</div>
+      <div class="skills">
+        <div class="chip">UX/UI</div>
+        <div class="chip">Motion</div>
+        <div class="chip">Illustration</div>
+      </div>
+    </div>
+    <div class="right">
+      <div class="headline">
+        <div>
+          <h2 style="margin:0">Profile</h2>
+          <p style="color:rgba(11,18,32,.6);margin-top:8px">A creative designer who blends illustration and product thinking to create memorable experiences.</p>
+        </div>
+        <div style="font-weight:700;color:var(--accent2)">Portfolio → taylor.design</div>
+      </div>
+
+      <div class="section">
+        <h3 style="margin:0">Experience</h3>
+        <p style="color:rgba(11,18,32,.6);margin-top:8px"><strong>Lead Designer</strong> — Studio Nova (2019–Present). Led visual direction for mobile apps and brand campaigns.</p>
+      </div>
+
+      <div class="section">
+        <h3 style="margin:0">Selected Work</h3>
+        <ul style="color:rgba(11,18,32,.6);margin-top:8px">
+          <li>Brand identity and app UI for Lumen</li>
+          <li>Interactive prototypes for onboarding flows</li>
+        </ul>
+      </div>
+
+      <div style="margin-top:10px">
+        <button class="btn" id="downloadPdf">Download PDF</button>
+        <button class="btn" id="downloadHtml" style="margin-left:8px;opacity:.95;">Download HTML</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+  <script>
+    document.getElementById('downloadPdf').addEventListener('click', function(){
+      const element = document.getElementById('content');
+      html2pdf().from(element).set({margin:0.4, filename: 'cv-creative.pdf', html2canvas:{scale:2}}).save();
+    });
+    document.getElementById('downloadHtml').addEventListener('click', function(){
+      const blob = new Blob([document.documentElement.outerHTML], {type: 'text/html'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'cv-creative.html'; a.click(); URL.revokeObjectURL(url);
+    });
+  </script>
+</body>
+</html>
