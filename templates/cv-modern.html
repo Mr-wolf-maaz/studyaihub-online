@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>CV — Modern</title>
+  <style>
+    :root{--accent:#4F46E5;--muted:#6B7280;--bg:#F8FAFF}
+    body{font-family:Inter,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:#0f172a;padding:40px}
+    .card{max-width:900px;margin:0 auto;background:white;border-radius:14px;box-shadow:0 8px 30px rgba(15,23,42,.08);overflow:hidden;display:grid;grid-template-columns:280px 1fr}
+    .left{background:linear-gradient(180deg,rgba(79,70,229,.06),transparent);padding:28px}
+    .photo{width:120px;height:120px;border-radius:14px;background:linear-gradient(135deg,var(--accent),#06b6d4);display:block;margin:0 auto 18px}
+    h1{font-size:22px;margin:8px 0;text-align:center}
+    .muted{text-align:center;color:var(--muted);font-size:13px}
+    .section{padding:28px}
+    .headline{display:flex;justify-content:space-between;align-items:center}
+    .skills{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+    .pill{background:#EEF2FF;color:var(--accent);padding:6px 10px;border-radius:999px;font-size:13px}
+    .experience{margin-top:14px}
+    .job{margin-bottom:14px}
+    .job h3{margin:0;font-size:15px}
+    .job .meta{color:var(--muted);font-size:13px}
+    .contact{margin-top:18px;font-size:14px}
+    @media(max-width:800px){.card{grid-template-columns:1fr;}}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <aside class="left">
+      <div class="photo"></div>
+      <h1>Alex Morgan</h1>
+      <div class="muted">Product Designer</div>
+      <div class="contact">
+        <p>Email: alex@example.com</p>
+        <p>Phone: +1 555 123 4567</p>
+        <p>Location: New York, USA</p>
+      </div>
+      <div style="margin-top:18px">
+        <strong>Skills</strong>
+        <div class="skills">
+          <span class="pill">Figma</span>
+          <span class="pill">UX Research</span>
+          <span class="pill">Prototyping</span>
+          <span class="pill">HTML/CSS</span>
+        </div>
+      </div>
+    </aside>
+    <main class="section">
+      <div class="headline">
+        <div>
+          <h2 style="margin:0">Professional Summary</h2>
+          <p class="muted" style="margin-top:8px">Product-focused designer with 6+ years building delightful interfaces and scalable design systems.</p>
+        </div>
+        <div style="color:var(--accent);font-weight:600">Portfolio → alexm.design</div>
+      </div>
+
+      <section class="experience">
+        <h3 style="margin-bottom:8px">Experience</h3>
+        <div class="job">
+          <h3>Senior Product Designer — Acme Co</h3>
+          <div class="meta">2020 — Present · Remote</div>
+          <p class="muted">Led design for the core web product; improved activation by 28% through refreshed onboarding flows and analytics-driven iterations.</p>
+        </div>
+        <div class="job">
+          <h3>Product Designer — Nebula</h3>
+          <div class="meta">2017 — 2020 · London</div>
+          <p class="muted">Built components and design patterns used across mobile and web apps; collaborated with engineers to ship features weekly.</p>
+        </div>
+      </section>
+
+      <section style="margin-top:12px">
+        <h3 style="margin-bottom:8px">Education</h3>
+        <p class="muted">B.A. Interaction Design — University of Arts</p>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
