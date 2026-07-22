@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CV — Professional</title>
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700;400&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+  <!-- Accent color: Indigo #4F46E5 -->
+  <style>
+    :root{--accent:#4F46E5;--text:#0F172A;--muted:#6B7280;--bg:#ffffff}
+    body{font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text);padding:32px}
+    .page{max-width:820px;margin:0 auto;border:1px solid #e6eef8;padding:36px;border-radius:10px}
+    header{display:flex;justify-content:space-between;align-items:center}
+    h1{font-family:Merriweather,serif;margin:0;font-size:28px}
+    .role{color:var(--muted);margin-top:6px}
+    .layout{display:grid;grid-template-columns:1fr 2fr;gap:28px;margin-top:20px}
+    .sidebar{border-right:1px solid #eef4ff;padding-right:20px}
+    .section{margin-bottom:16px}
+    .section h3{margin:0 0 8px 0;color:var(--accent)}
+    .muted{color:var(--muted)}
+    .download{margin-top:12px}
+    .btn{background:var(--accent);color:white;padding:9px 12px;border-radius:8px;border:none;cursor:pointer}
+
+    /* Print rules: remove UI and ensure good page breaks */
+    @media print{
+      body{padding:0}
+      .page{border:none;border-radius:0;padding:18mm;margin:0}
+      .btn,.download{display:none}
+      .layout{grid-template-columns:1fr 2fr}
+      h1{font-size:22px}
+    }
+
+    @media(max-width:820px){.layout{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <main class="page" id="content">
+    <header>
+      <div>
+        <h1>Samir Khan</h1>
+        <div class="role">Senior Software Engineer</div>
+      </div>
+      <div class="muted">samir@example.com · +1 555 888 222 · City, Country</div>
+    </header>
+
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="section">
+          <h3>Skills</h3>
+          <ul class="muted">
+            <li>TypeScript, Node.js</li>
+            <li>System design</li>
+            <li>Testing & CI/CD</li>
+          </ul>
+        </div>
+
+        <div class="section">
+          <h3>Education</h3>
+          <p class="muted">M.S. Computer Science — University</p>
+        </div>
+
+        <div class="section">
+          <h3>Languages</h3>
+          <p class="muted">English (Fluent), Spanish (Intermediate)</p>
+        </div>
+      </aside>
+
+      <section>
+        <div class="section">
+          <h3>Summary</h3>
+          <p class="muted">Experienced engineering leader focused on building reliable backend systems and mentoring teams to deliver scalable products.</p>
+        </div>
+
+        <div class="section">
+          <h3>Experience</h3>
+          <div>
+            <strong>Lead Backend Engineer — Orion</strong>
+            <div class="muted">2020 — Present</div>
+            <p class="muted">Architected microservices platform, improved uptime and scaled system to handle 10x traffic.</p>
+          </div>
+
+          <div style="margin-top:12px">
+            <strong>Senior Software Engineer — Atlas</strong>
+            <div class="muted">2016 — 2020</div>
+            <p class="muted">Built core APIs and introduced observability and testing frameworks.</p>
+          </div>
+        </div>
+
+        <div class="download">
+          <button class="btn" id="downloadPdf">Download PDF</button>
+          <button class="btn" id="downloadHtml" style="margin-left:8px">Download HTML</button>
+        </div>
+      </section>
+    </div>
+
+    <p style="margin-top:18px;font-size:12px;color:var(--muted)">Fonts used: Merriweather (headings), Inter (body). Accent color: Indigo #4F46E5. This template is print-optimized.</p>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+  <script>
+    document.getElementById('downloadPdf').addEventListener('click', function(){
+      const element = document.getElementById('content');
+      html2pdf().from(element).set({margin:0.6, filename: 'cv-professional.pdf', html2canvas:{scale:2}}).save();
+    });
+    document.getElementById('downloadHtml').addEventListener('click', function(){
+      const blob = new Blob([document.documentElement.outerHTML], {type: 'text/html'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'cv-professional.html'; a.click(); URL.revokeObjectURL(url);
+    });
+  </script>
+</body>
+</html>
