@@ -1,5 +1,32 @@
-This is a placeholder PPTX file for the "Academic" presentation template.
+Slide 1: Title Slide
+Title: Title of the Study
+Author(s), Affiliation, Date
 
-Replace this file with a real .pptx presentation to provide downloadable slides.
+---
+Slide 2: Background
+- Brief background and context.
 
-Template source: templates/presentation-maker/academic.md
+---
+Slide 3: Research Question / Hypothesis
+- State the hypothesis or research objective.
+
+---
+Slide 4: Methods
+- Study design, data collection, key methods.
+
+---
+Slide 5: Results
+- Key findings (use charts or bullet points).
+
+---
+Slide 6: Discussion
+- Interpret findings and their implications.
+
+---
+Slide 7: Conclusion
+- Main takeaways and future work.
+
+References:
+- Key citations (short list).
+
+Notes: This is a generated PPTX placeholder (plain-text slide outline). To convert to a real .pptx, open PowerPoint and paste slide content into individual slides, then save as PPTX.
