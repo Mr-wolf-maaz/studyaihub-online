@@ -1,0 +1,44 @@
+[
+  {
+    "id": "modern",
+    "type": "cv",
+    "title": "Modern CV",
+    "md": "https://raw.githubusercontent.com/Mr-wolf-maaz/studyaihub-online/main/templates/cv-creator/modern.md",
+    "docx": "/templates/docx/modern.docx"
+  },
+  {
+    "id": "professional",
+    "type": "cv",
+    "title": "Professional CV",
+    "md": "https://raw.githubusercontent.com/Mr-wolf-maaz/studyaihub-online/main/templates/cv-creator/professional.md",
+    "docx": "/templates/docx/professional.docx"
+  },
+  {
+    "id": "minimal",
+    "type": "cv",
+    "title": "Minimal CV",
+    "md": "https://raw.githubusercontent.com/Mr-wolf-maaz/studyaihub-online/main/templates/cv-creator/minimal.md",
+    "docx": "/templates/docx/minimal.docx"
+  },
+  {
+    "id": "pitch",
+    "type": "presentation",
+    "title": "Pitch Presentation",
+    "md": "https://raw.githubusercontent.com/Mr-wolf-maaz/studyaihub-online/main/templates/presentation-maker/pitch.md",
+    "pptx": "/templates/pptx/pitch.pptx"
+  },
+  {
+    "id": "academic",
+    "type": "presentation",
+    "title": "Academic Presentation",
+    "md": "https://raw.githubusercontent.com/Mr-wolf-maaz/studyaihub-online/main/templates/presentation-maker/academic.md",
+    "pptx": "/templates/pptx/academic.pptx"
+  },
+  {
+    "id": "portfolio",
+    "type": "presentation",
+    "title": "Portfolio Presentation",
+    "md": "https://raw.githubusercontent.com/Mr-wolf-maaz/studyaihub-online/main/templates/presentation-maker/portfolio.md",
+    "pptx": "/templates/pptx/portfolio.pptx"
+  }
+]

@@ -11,6 +11,7 @@ export default function Navbar() {
     { href: "/", label: "Home", icon: Home },
     { href: "/cv-creator", label: "CV Creator", icon: FileText },
     { href: "/presentation-maker", label: "Presentation Maker", icon: Presentation },
+    { href: "/templates", label: "Templates", icon: BookOpen },
     { href: "/typing-learner", label: "Typing Learner", icon: Keyboard },
     { href: "/blog", label: "Blog", icon: BookOpen },
   ];
@@ -75,11 +76,11 @@ export default function Navbar() {
               onClick={() => setOpen(false)}
               className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition"
             >
-              <l.icon size={16} />
+              <l.icon size={18} />
               {l.label}
             </Link>
           ))}
-          <div className="border-t border-slate-200">
+          <div className="border-t border-slate-100 mt-1">
             {secondaryLinks.map((l) => (
               <Link
                 key={l.href}
@@ -87,7 +88,7 @@ export default function Navbar() {
                 onClick={() => setOpen(false)}
                 className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition"
               >
-                <l.icon size={16} />
+                <l.icon size={18} />
                 {l.label}
               </Link>
             ))}
