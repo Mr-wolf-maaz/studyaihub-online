@@ -43,12 +43,17 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <head>
-        <link rel="canonical" href="https://studyaihub.online" />
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-        <link rel="apple-touch-icon" href="/favicon.svg" />
-        <meta name="google-site-verification" content="KvdeXxUFjuUzTXeK0qj-y_JV0yPiJdctn6NY8hVjZRY" />
-      </head>
+     <head>
+  <link rel="canonical" href="https://studyaihub.online" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="/favicon.svg" />
+
+  <Script
+    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2445813015877736"
+    strategy="beforeInteractive"
+    crossOrigin="anonymous"
+  />
+</head>
       <body className="bg-slate-50 text-slate-900 antialiased min-h-screen flex flex-col">
         <Navbar />
         <main className="flex-1">{children}</main>
