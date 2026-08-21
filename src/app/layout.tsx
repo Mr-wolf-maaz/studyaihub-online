@@ -43,10 +43,15 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-     <head>
+  <head>
   <link rel="canonical" href="https://studyaihub.online" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="/favicon.svg" />
+
+  <meta
+    name="google-adsense-account"
+    content="ca-pub-2445813015877736"
+  />
 
   <Script
     src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2445813015877736"
